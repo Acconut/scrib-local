@@ -1,0 +1,10 @@
+{
+    "name": "scrib-local",
+    "version": "0.0.0-dev",
+    
+    "main": "lib/adapter.js",
+    
+    "dependencies": {
+        "mkdirp": "0.3.x"
+    }
+}
