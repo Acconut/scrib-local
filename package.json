@@ -1,10 +1,21 @@
 {
     "name": "scrib-local",
     "version": "0.0.0-dev",
+    "description": "An adapter for Scrib for writing local log file",
     
     "main": "lib/adapter.js",
     
     "dependencies": {
         "mkdirp": "0.3.x"
+    },
+    
+    "devDependencies": {
+        "nodeunit": "0.8.x",
+        "scrib": "0.0.x",
+        "rimraf": "2.2.x"
+    },
+    
+    "scripts": {
+        "test": "nodeunit ./test/index.js"
     }
 }
