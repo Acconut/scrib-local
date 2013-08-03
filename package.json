@@ -1,6 +1,6 @@
 {
     "name": "scrib-local",
-    "version": "0.0.0",
+    "version": "0.1.0",
     "description": "An adapter for Scrib for writing local log file",
     
     "main": "lib/adapter.js",
