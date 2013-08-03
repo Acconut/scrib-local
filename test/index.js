@@ -4,19 +4,25 @@ var Scrib = require("scrib"),
     EOL = require("os").EOL,
     path = require("path").join(__dirname, "./data/log.txt"),
     Tests = module.exports,
+    tf = null,
     logger = null,
-    c = null;
+    c = null,
+    i = 0;
 
-Tests.setUp = function(cb) {
-    
-    // Make sure there's nothing
-    rimraf.sync(path);
+Tests.write = function(test) {
+    try {
+        // Clean it up
+        fs.unlinkSync(path);
+    } catch(e) {}
     
     logger = new Scrib({
         "../": {
             file: "./data/log.txt",
             filter: function(m) {
                 return m.priority > 3;
+            },
+            format: function(m) {
+                return i++ + EOL;
             }
         }
     }, function(e) {
@@ -27,33 +33,46 @@ Tests.setUp = function(cb) {
         logger.put("TooLowPriority", {}, 2, "NO", "Logs");
         
         fs.readFile(path, function(er, data) {
-            if(er) throw er;
+            test.expect(3);
             
-            c = data.toString();
+            var entries = data.toString().split(EOL);
             
-            cb();
+            test.ifError(er);
+            test.equal(entries.length, 3, "Two entries");
+            test.equal(entries[0], "0", "Formater returned correct value");
+            
+            try {
+                // Clean it up
+                fs.unlinkSync(path);
+            } catch(e) {
+                test.done(e);
+            }
+            test.done();
         });
         
     });
-};
-
-Tests.tearDown = function(cb) {
-    
-    // Clean it up
-    rimraf.sync(path);
-    
-    cb();
     
 };
 
-Tests.write = function(test) {
+Tests.transformers = {
     
-    var entries = c.split(EOL);
+    raw: function(test) {
+        tf = require("../").transformers
         
-    test.equal(entries.length, 3, "Two entries");
-    test.ok(/GMT\] 9 MSG \(Logs\): Message \{"42":true\}$/.test(entries[0]), "Right format"); 
-    test.ok(/GMT\] 5 MSG_2 \(Logs\): Message2 \{"node":"up"\}$/.test(entries[1]), "Right format (2)"); 
-
-    test.done();
-    
+        test.expect(1);
+        
+        var msg = {
+            message: "Message",
+            data: { node: "up" },
+            priority: 9,
+            id: "MSG",
+            category: "Logs",
+            time: Date.now()
+        },
+            val = tf.raw(msg);
+        
+        test.ok(val.substr(val.indexOf("GMT")) === 'GMT] 9 MSG (Logs): Message {"node":"up"}' + EOL, "Correct format"); 
+        
+        test.done();
+    }
 };
