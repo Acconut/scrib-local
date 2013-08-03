@@ -1,5 +1,4 @@
 var Scrib = require("scrib"),
-    rimraf = require("rimraf"),
     fs = require("fs"),
     EOL = require("os").EOL,
     path = require("path").join(__dirname, "./data/log.txt"),
@@ -10,10 +9,9 @@ var Scrib = require("scrib"),
     i = 0;
 
 Tests.write = function(test) {
-    try {
-        // Clean it up
-        fs.unlinkSync(path);
-    } catch(e) {}
+    
+    // Clean it up
+    if(fs.existsSync(path)) fs.unlinkSync(path);
     
     logger = new Scrib({
         "../": {
